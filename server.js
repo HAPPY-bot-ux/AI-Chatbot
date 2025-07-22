@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Use the correct class name
-const ai = new GoogleGenerativeAI("AIzaSyDFMHiBn1uB65FsAuyYqQAMLtKvznLrpZY");
+//Put your won API KEY
+const ai = new GoogleGenerativeAI("");
 
 const app = express();
 const PORT = process.env.PORT || 5500;
