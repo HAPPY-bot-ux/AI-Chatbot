@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Site Mastery Chatbot</title>
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e6e6e6;
+  }
+
+  /* Chat Icon */
+  #chat-icon {
+    background-color: #0056b3; /* Site Mastery primary color */
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Chat Container */
+  #chat-container {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 400px;
+    height: 500px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  #chat-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  #chat-history {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 350px;
+    background-color: #f4f7fb;
+  }
+
+  .user-message {
+    text-align: right;
+    padding: 10px;
+    background-color: #0056b3;
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+
+  .bot-message {
+    text-align: left;
+    padding: 10px;
+    background-color: #e1f5ff;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+
+  form {
+    display: flex;
+    padding: 10px;
+  }
+
+  input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+
+  #loader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+</head>
+<body>
+
+<div id="chat-icon">💬</div>
+
+<div id="chat-container">
+  <div id="chat-header">Site Mastery Chatbot</div>
+  <div id="chat-history"></div>
+  <form id="chat-form">
+    <input type="text" id="user-input" placeholder="Enter your message">
+    <button type="submit">Send</button>
+  </form>
+  <div id="loader">
+    <img src="loader.gif" width="100px" alt="Loading...">
+  </div>
+</div>
+
+<script>
+  const chatIcon = document.getElementById('chat-icon');
+  const chatContainer = document.getElementById('chat-container');
+  const chatHistory = document.getElementById('chat-history');
+  const userInput = document.getElementById('user-input');
+  const form = document.getElementById('chat-form');
+
+  chatIcon.addEventListener('click', () => {
+    chatContainer.style.display = chatContainer.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  async function sendMessage() {
+    const userMessage = userInput.value;
+    userInput.value = '';
+    chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+    
+    const loader = document.getElementById('loader');
+    loader.style.display = 'block';
+
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userInput: userMessage }),
+      });
+
+      const data = await response.json();
+      const botMessage = data.response;
+      chatHistory.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    } catch (error) {
+      console.error('Error:', error);
+      chatHistory.innerHTML += `<div class="bot-message">Sorry, there was an error. Please try again later.</div>`;
+    } finally {
+      loader.style.display = 'none';
+    }
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    sendMessage();
+  });
+</script>
+
+</body>
+</html>
